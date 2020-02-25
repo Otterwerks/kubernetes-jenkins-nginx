@@ -1,29 +1,21 @@
-podTemplate(cloud: 'kubernetes' ,label: 'docker',
-  containers: [
-    containerTemplate(name: 'docker', image: '127.0.0.1:5000/library/docker:git', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'kubectl', image: '127.0.0.1:5000/jenkins/jenkins-kubectl:alpine', ttyEnabled: true, command: 'cat')
-  ],
-  volumes: [
-    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-  ]) {
-  node('docker') {
-    gitlabCommitStatus(name: 'jenkins') {
-      git credentialsId: 'jenkins-gitlab', url: 'ssh://git@127.0.0.1:8066/lanqisong/project-test'
-      sh "git rev-parse --short HEAD > commit-id"
-      tag = readFile('commit-id').replace("\n", "").replace("\r", "")
-      stage('Build Docker image') {
-        container('docker') {
-          sh "docker build --no-cache -t nginx:${tag} ."
-          sh "docker tag nginx:${tag} 127.0.0.1:5000/library/nginx:${tag}"
-          sh "docker push 127.0.0.1:5000/library/nginx:${tag}"
-        }
-      }
-      stage('Apply new deployment'){
-        container('kubectl') {
-          sh "sed 's#nginx:latest#nginx:'${tag}'#g' deployment.yaml | kubectl apply -f -"
-          sh "kubectl rollout status deployment/nginx"
-        }
-      }
-    }
-  }
+//Jenkinsfile
+node {
+stage('Preparation') {
+      //Installing kubectl in Jenkins agent
+      sh 'curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/arm/kubectl'
+  sh 'chmod +x ./kubectl && mv kubectl /usr/local/sbin'
+//Clone git repository
+  git url:'https://github.com/Otterwerks/kubernetes-jenkins-nginx.git'
+   }
+  
+  //Test deploy only
+stage('Integration') {
+ 
+      withKubeConfig([credentialsId: 'jenkins-robot', serverUrl: 'https://192.168.11.24:6443']) {
+      
+         sh 'kubectl apply -f deployment.yaml'
+        
+      }                      
+      
+ }
 }
