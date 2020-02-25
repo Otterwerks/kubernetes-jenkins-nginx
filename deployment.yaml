@@ -6,7 +6,7 @@ metadata:
     app: nginx
 spec:
   ports:
-    - port: 80
+    - port: 34343
       targetPort: 80
   selector:
     app: nginx
@@ -30,7 +30,7 @@ spec:
         tier: nginx
     spec:
       containers:
-      - image: 127.0.0.1:5000/library/nginx:latest
+      - image: arm32v7/nginx
         name: nginx
         ports:
         - containerPort: 80
