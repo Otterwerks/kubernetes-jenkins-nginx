@@ -3,7 +3,7 @@ node {
 stage('Preparation') {
       //Installing kubectl in Jenkins agent
       sh 'curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/arm/kubectl'
-  sh 'sudo chmod +x ./kubectl && mv kubectl /usr/bin'
+  su 'chmod +x ./kubectl && mv kubectl /usr/bin'
 //Clone git repository
   git url:'https://github.com/Otterwerks/kubernetes-jenkins-nginx.git'
    }
