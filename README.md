@@ -1,1 +1,1 @@
-This is the first project to test gitlab on kubernetes
+Test repo for Jenkins CI on Kubernetes
