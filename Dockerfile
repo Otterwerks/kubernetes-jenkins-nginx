@@ -1,5 +1,3 @@
-FROM 127.0.0.1:5000/library/nginx:latest
-
+FROM arm32v7/nginx
+COPY default.conf /etc/nginx/conf.d/default.conf
 COPY index.html /usr/share/nginx/html/index.html
-
-EXPOSE 80
