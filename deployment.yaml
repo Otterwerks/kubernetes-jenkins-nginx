@@ -1,37 +1,35 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx
+  name: nginx-demo-service
   labels:
-    app: nginx
+    app: nginx-demo
 spec:
   ports:
     - port: 34343
       targetPort: 80
   selector:
-    app: nginx
-    tier: nginx
+    app: nginx-demo
   type: NodePort
 
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: nginx
+  name: nginx-demo-deployment
   labels:
-    app: nginx
+    app: nginx-demo
 spec:
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: nginx
-        tier: nginx
+        app: nginx-demo
     spec:
       containers:
-      - image: arm32v7/nginx
-        name: nginx
+      - image: otterwerks/kubernetes-jenkins-nginx-demo
+        name: nginx-demo
         ports:
         - containerPort: 80
           name: nginx
