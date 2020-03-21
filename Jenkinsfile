@@ -13,13 +13,15 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh 'docker build -t otterwerks/kubernetes-jenkins-nginx-demo .'
-				sh 'docker push otterwerks/kubernetes-jenkins-nginx-demo' //requires once from kubernetes host node: docker exec -it <jenkins-container-id> bash, docker login
+				 withDockerRegistry([ credentialsId: "dockerhub", url: "" ]) {
+                        sh 'docker push otterwerks/kubernetes-jenkins-nginx-demo'
+                    }
 			}
 		}
 
 		stage('Deploy') {
 			steps {
-				withKubeConfig([credentialsId: 'jenkins-robot',
+				withKubeConfig([credentialsId: 'jenkins-robot-global',
 								serverUrl: 'https://192.168.11.24:6443'
 								]) {
 									sh 'kubectl apply -f deployment.yaml'
